@@ -14,7 +14,7 @@ class StompClient {
 	stompClient: CompatClient = Stomp.over(this.socket);
 
 	// 웹소켓 연결 요청 & 구독 요청
-	onConnect = (destination: string, callback: messageCallbackType = () => {}) => {
+	onSubscribe = (destination: string, callback: messageCallbackType = () => {}) => {
 		let newMessage = "";
 		this.stompClient.connect({}, () => {
 			this.stompClient.subscribe(destination, callback);
@@ -25,7 +25,13 @@ class StompClient {
 	};
 
 	onSend = (destination: string, headers?: StompHeaders, body?: string)  => {
-		this.stompClient.send(destination, headers, body);
+		let newMessage = "";
+		this.stompClient.connect({}, () => {
+			this.stompClient.send(destination, headers, body);
+		}, (error: IFrame) => {
+      console.error(error);
+    });
+		return newMessage;
 	};
 
 	// receiveMessage = () => {};

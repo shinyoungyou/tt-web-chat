@@ -28,7 +28,7 @@ const chatSlice = createSlice({
       //   senderName: state.my.username,
       //   status: Status.JOIN
       // };
-      state.my.username = action.payload.username
+      state.my.username = action.payload.senderName
       stompClient.onSend("/app/message", {}, JSON.stringify(action.payload));
     },
     connect(state) {
@@ -38,7 +38,7 @@ const chatSlice = createSlice({
       state.my.connected = false;
     },
     subscribePublic(state) {
-      stompClient.onConnect('/chatroom/public', async (response: IMessage) => {
+      stompClient.onSubscribe('/chatroom/public', async (response: IMessage) => {
         const responseData = await JSON.parse(response.body);
         switch (responseData.status) {
           case Status.JOIN:
@@ -53,7 +53,7 @@ const chatSlice = createSlice({
       });
     },
     subscribePrivate(state) {
-      stompClient.onConnect('/user/'+state.my.username+'/private', async (response: IMessage)=>{
+      stompClient.onSubscribe('/user/'+state.my.username+'/private', async (response: IMessage)=>{
         console.log(response);
         const responseData = await JSON.parse(response.body);
         if(state.privateChats.get(responseData.senderName)){
